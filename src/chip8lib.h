@@ -15,6 +15,7 @@ typedef struct {
     uint16_t *SP;
     uint16_t *STACK;
     uint8_t *VRAM;
+	uint16_t *KEY;
 } emulator;
 
 
