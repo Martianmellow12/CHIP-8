@@ -2,3 +2,5 @@
 Documentation.docx
 Timing.xlsx
 Chip8.pdf
+src/chip8lib.o
+src/chip8lib.so
