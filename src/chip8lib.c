@@ -1,6 +1,8 @@
 // CHIP-8 Emulation Library
 // Written by Michael Kersting, Jr.
 // May 5, 2020
+#include <time.h>
+#include <stdlib.h>
 #include "chip8lib.h"
 
 
@@ -235,4 +237,114 @@ void op_8xy4(emulator *e, uint16_t op) {
 	
 	PC_INC(e);
 	return;
+}
+
+
+// Opcode 8xy5 - Set Vx = Vx - Vy, and set VF = NOT borrow
+void op_8xy5(emulator *e, uint16_t op) {
+	// Get x and y
+	uint8_t x = (op & 0x0F00) >> 8;
+	uint8_t y = (op & 0x00F0) >> 4;
+	
+	// Set the borrow flag
+	if (e->V[x] > e->V[y]) e->V[0xF] = 1;
+	else e->V[0xF] = 0;
+	
+	// Set the result
+	e->V[x] -= e->V[y];
+	
+	PC_INC(e);
+	return;
+}
+
+
+// Opcode 8xy6 - Shift Vx right by 1 bit, and set VF = LSB of Vx pre-shift
+void op_8xy6(emulator *e, uint16_t op) {
+	// Get x
+	uint8_t x = (op & 0x0F00) >> 8;
+	
+	// Set VF
+	e->V[0xF] = (e->V[x] & 0x01);
+	
+	// Set Vx
+	e->V[x] = (e->V[x] >> 1);
+	
+	PC_INC(e);
+	return;
+}
+
+
+// Opcode 8xy7 - Set Vx = Vy - Vx, and set VF = NOT borrow
+void op_8xy7(emulator *e, uint16_t op) {
+	// Get x and y
+	uint8_t x = (op & 0x0F00) >> 8;
+	uint8_t y = (op & 0x00F0) >> 4;
+	
+	// Set the borrow flag
+	if (e->V[y] > e->V[x]) e->V[0xF] = 1;
+	else e->V[0xF] = 0;
+	
+	// Set the result
+	e->V[x] = e->V[y] - e->V[x];
+	
+	PC_INC(e);
+	return;
+}
+
+
+// Opcode 8xyE - Shift Vx left by 1 bit, and set VF = MSB of Vx pre-shift
+void op_8xyE(emulator *e, uint16_t op) {
+	// Get x
+	uint8_t x = (op & 0x0F00) >> 8;
+	
+	// Set VF
+	e->V[0xF] = (e->V[x] & 0x80);
+	
+	// Set Vx
+	e->V[x] = (e->V[x] << 1);
+	
+	PC_INC(e);
+	return;
+}
+
+
+// Opcode 9xy0 - Skip the next instruction if Vx != Vy
+void op_9xy0(emulator *e, uint16_t op) {
+	// Get x and y
+	uint8_t x = (op & 0x0F00) >> 8;
+	uint8_t y = (op & 0x00F0) >> 4;
+	
+	// Increment the PC if Vx != Vy
+	if (e->V[x] != e->V[y]) PC_INC(e);
+	
+	PC_INC(e);
+	return;
+}
+
+
+// Opcode Annn - Set I = nnn
+void op_Annn(emulator *e, uint16_t op) {
+	// Set I equal to nnn
+	*(e->I) = (op & 0x0FFF);
+	
+	PC_INC(e);
+	return;
+}
+
+
+// Opcode Bnnn - Jump to location nnn + V0
+void op_Bnnn(emulator *e, uint16_t op) {
+	// Set the PC = nnn + V0
+	*(e->PC) = (op & 0x0FFF) + (e->V[0x0]);
+	
+	// DON'T INCREMENT PC
+	return;
+}
+
+
+// Opcode Cxkk - Set Vx = randint_8bit AND kk
+void op_Cxkk(emulator *e, uint16_t op) {
+	// Generate a random integer from 0 to 255 inclusive
+	srand(time(NULL));
+	uint16_t rand_8bit = rand() % 0xFF;
 }
