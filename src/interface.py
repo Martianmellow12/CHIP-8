@@ -10,6 +10,18 @@ WIDTH = 64 * SCALE
 HEIGHT = 32 * SCALE
 
 
+# Initialization Function
+def initialize(win_scale=5):
+    # Set up window variables
+    SCALE = win_scale
+    WIDTH = 64 * win_scale
+    HEIGHT = 32 * win_scale
+
+    # Initialize pygame
+    pygame.init()
+    screen
+
+
 # Set up pygame for a display
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
